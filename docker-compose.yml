@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./apache/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        APACHE_DOCUMENT_ROOT: ${PROJECT_FOLDER_WEB}
+        DOMAIN_HOST_MAIN: ${DOMAIN_HOST_MAIN}
+        DOMAIN_HOST_ALIAS: ${DOMAIN_HOST_ALIAS}
+    container_name: ${COMPOSE_PROJECT_NAME}-web
+    ports:
+      - ${PORT_WEB}
+    volumes:
+      - project_folder:/var/www/html
+    links:
+      - mysql
+    restart: always
+
+  mysql:
+    image: ${MYSQL_VERSION}
+    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    ports:
+      - ${PORT_DB}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/conf/disable_strict_mode.cnf:/etc/mysql/conf.d/disable_strict_mode.cnf
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ${COMPOSE_PROJECT_NAME}-phpmyadmin
+    ports:
+      - ${PORT_PMA}
+    environment:
+      - PMA_HOST=mysql
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+  project_folder:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${PROJECT_FOLDER}
