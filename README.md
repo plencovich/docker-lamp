@@ -2,7 +2,7 @@
 
 # Plen.co / Dockers
 
-## Docker LAMP with APACHE / MYSQL / APACHE
+## Docker LAMP with APACHE / MYSQL / PHP
 
 ###### Version 05.2021 | v1
 
