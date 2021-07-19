@@ -13,6 +13,9 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}-web
     ports:
       - ${PORT_WEB}
+    networks:
+      vpcpr:
+        ipv4_address: ${IP_WEB}
     volumes:
       - project_folder:/var/www/html
     links:
@@ -21,22 +24,30 @@ services:
 
   mysql:
     image: ${MYSQL_VERSION}
-    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    container_name: ${DOCKER_NAME_MYSQL}
+    hostname: mysql
     ports:
       - ${PORT_DB}
+    networks:
+      vpcpr:
+        ipv4_address: ${IP_DB}
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./mysql/conf/custom.cnf:/etc/mysql/conf.d/custom.cnf
       - ./mysql/conf/disable_strict_mode.cnf:/etc/mysql/conf.d/disable_strict_mode.cnf
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: ${COMPOSE_PROJECT_NAME}-phpmyadmin
+    container_name: ${DOCKER_NAME_PHPMYADMIN}
     ports:
       - ${PORT_PMA}
     environment:
-      - PMA_HOST=mysql
+      - PMA_HOST=${IP_DB}
+    networks:
+      vpcpr:
+        ipv4_address: ${IP_DBADMIN}
     depends_on:
       - mysql
 
@@ -48,3 +59,10 @@ volumes:
       o: bind
       type: none
       device: ${PROJECT_FOLDER}
+networks:
+  vpcpr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${IP_RANGE}
+          gateway: ${IP_GATEWAY}
