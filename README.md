@@ -4,7 +4,7 @@
 
 ## Docker LAMP with APACHE / MYSQL / PHP
 
-###### Version 05.2021 | v1
+###### Version 08.2021 | v2
 
 ___
 
